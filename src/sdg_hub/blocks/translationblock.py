@@ -5,6 +5,7 @@ import re
 
 # Third Party
 from datasets import Dataset
+from jinja2 import Template
 from tqdm import tqdm
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import httpx
@@ -12,10 +13,13 @@ import openai
 import torch
 
 # Local
-from .. import prompts as default_prompts  # pylint: disable=unused-import
+# from .. import prompts as default_prompts  # pylint: disable=unused-import
+# from ..registry import BlockRegistry, PromptRegistry
+# from ..utils import models
+# from .block import Block 
+from .block import Block
+from ..logger_config import setup_logger
 from ..registry import BlockRegistry, PromptRegistry
-from ..utils import models
-from .block import Block, BlockConfigParserError
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 logger = logging.getLogger(__name__)
@@ -23,10 +27,10 @@ logger = logging.getLogger(__name__)
 DEFAULT_MAX_NUM_TOKENS = 8192
 
 
-def template_from_struct_and_config(struct, config):
-    # Replace None values with empty strings
-    filtered_config = {k: (v if v is not None else "") for k, v in config.items()}
-    return PromptRegistry.template_from_string(struct.format(**filtered_config))
+# def template_from_struct_and_config(struct, config):
+#     # Replace None values with empty strings
+#     filtered_config = {k: (v if v is not None else "") for k, v in config.items()}
+#     return PromptRegistry.template_from_string(struct.format(**filtered_config))
 
 
 # This is part of the public API.
@@ -38,8 +42,6 @@ class TranslationBlock(Block):
     # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
-        ctx,
-        pipe,
         block_name,
         config_path,
         output_cols,
@@ -51,22 +53,23 @@ class TranslationBlock(Block):
         parser_kwargs={},
         batch_kwargs={},
     ) -> None:
-        super().__init__(ctx, pipe, block_name)
+        super().__init__(block_name)
         self.block_config = self._load_config(config_path)
-        self.prompt_struct = prompt_struct
-        self.prompt_template = template_from_struct_and_config(
-            self.prompt_struct, self.block_config
-        )
+        # self.prompt_struct = prompt_struct
+        # self.prompt_template = Template(self.prompt_struct.format(**filtered_config))
         self.source_lang = source_lang
         self.target_lang = target_lang
         self.trans_model_id = trans_model_id
         # self.trans_model_id = f"Helsinki-NLP/opus-mt-{source_lang}-{target_lang}"
         self.output_cols = output_cols
         self.batch_params = batch_kwargs
-        max_num_token_override = ctx.max_num_tokens
         self.parser_name = parser_kwargs.get("parser_name", None)
         self.parsing_pattern = parser_kwargs.get("parsing_pattern", None)
         self.parser_cleanup_tags = parser_kwargs.get("parser_cleanup_tags", None)
+        self.defaults = {
+            "temperature": 0,
+            "max_tokens": 4096,
+        }
 
         # Load tokenizer and model for translation
         try:
