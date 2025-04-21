@@ -1,8 +1,8 @@
 
-  # - name: translation_document
-  #   type: TranslationBlock
-  #   config:
-  #     config_path: ../../configs/knowledge/translate_documents.yaml
+  # - block_type: TranslationBlock
+  #   block_config:
+  #     block_name: translate_document
+  #     config_path: /opt/app-root/src/.local/share/instructlab/new_ilab_sdg/src/sdg_hub/configs/knowledge/translate_documents.yaml
   #     output_cols:
   #     - document_translated
   #     source_lang: "hin_Deva"  # Source language (English)
@@ -23,7 +23,7 @@
   #       n: scaled
   #     parser_kwargs:
   #       parser_name: custom
-  #       parsing_pattern: (?:Question|QUESTION)\:\s*(.*?)\s*(?:Answer|ANSWER)\:\s*(.*)
+  #       parsing_pattern: ^(.*\?)\s*(.+)$
   #       parser_cleanup_tags:
   #         - "[END]"
   #         - "[End]"
@@ -32,27 +32,39 @@
   #   drop_duplicates:
   #     - question
   #   model_family: granite
-- block_type: LLMBlock
-  block_config:
-    block_name: gen_knowledge
-    config_path: configs/knowledge/simple_generate_qa.yaml
-    model_id: mistralai/Mixtral-8x7B-Instruct-v0.1
-    output_cols:
+  - block_type: LLMBlock
+    block_config:
+      block_name: gen_knowledge
+      config_path: configs/knowledge/simple_generate_qa.yaml
+      model_id: mistralai/Mixtral-8x7B-Instruct-v0.1
+      output_cols:
+        - output
+    gen_kwargs:
+      temperature: 0.7
+      max_tokens: 2048
+    drop_duplicates:
       - output
-  gen_kwargs:
-    temperature: 0.7
-    max_tokens: 2048
-  drop_duplicates:
-    - output
 
-- block_type: TranslationBlock
-  block_config:
-    block_name: translation_qa
-    config_path: /opt/app-root/src/.local/share/instructlab/new_ilab_sdg/src/sdg_hub/configs/knowledge/translate_question_response.yaml
-    output_cols:
-      - output_translated
-    source_lang: "eng_Latn"  # Source language (English)
-    target_lang: "hin_Deva"  # Target language (French)
-    trans_model_id: facebook/nllb-200-distilled-600M
+  - block_type: TranslationBlock
+    block_config:
+      block_name: translation_qa
+      config_path: /opt/app-root/src/.local/share/instructlab/new_ilab_sdg/src/sdg_hub/configs/knowledge/translate_question_response.yaml
+      output_cols:
+        - output_translated
+      source_lang: "eng_Latn"  # Source language (English)
+      target_lang: "hin_Deva"  # Target language (French)
+      trans_model_id: facebook/nllb-200-distilled-600M
     
 
+# - block_type: LLMBlock
+#   block_config:
+#     block_name: gen_knowledge
+#     config_path: configs/knowledge/simple_generate_qa.yaml
+#     model_id: mistralai/Mixtral-8x7B-Instruct-v0.1
+#     output_cols:
+#       - output
+#   gen_kwargs:
+#     temperature: 0.7
+#     max_tokens: 2048
+#   drop_duplicates:
+#     - output
