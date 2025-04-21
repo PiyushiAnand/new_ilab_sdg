@@ -1,6 +1,7 @@
 - block_type: TranslationBlock
   block_config:
-    config_path: ../../configs/knowledge/translate_documents.yaml
+    block_name: document_translation
+    config_path: configs/knowledge/translate_documents.yaml
     output_cols:
     - document_translated
     source_lang: "hin_Deva"  # Source language (English)
@@ -10,7 +11,9 @@
 
 - block_type: LLMBlock
   block_config:
-    config_path: ../../configs/knowledge/simple_generate_qa_translate.yaml
+    block_name: question_response_generation
+    model_id: "Qwen/Qwen2.5-1.5B-Instruct"
+    config_path: configs/knowledge/simple_generate_qa_translate.yaml
     output_cols:
       - question
       - response
@@ -23,11 +26,11 @@
   gen_kwargs:
     max_tokens: 2048
     temperature: 0.7
-    n: scaled
 
 - block_type: TranslationBlock
   block_config:
-    config_path: ../../configs/knowledge/translate_question_response.yaml
+    block_name: question_response_translation
+    config_path: configs/knowledge/translate_question_response.yaml
     output_cols:
     - question_translated
     - response_translated
