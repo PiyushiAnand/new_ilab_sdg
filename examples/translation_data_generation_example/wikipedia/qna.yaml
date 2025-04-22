@@ -1,0 +1,74 @@
+document_outline: General
+domain: General
+seed_examples:
+- context: |
+    Global blockchain company Binance has completed its acquisition of Swipe, the multi-currency digital wallet and Visa debit card platform, for an undisclosed amount.
+    The move helps accelerate plans for the company to widen the launch of its Binance Card, which will enable users to buy goods and services using cryptocurrency such as Bitcoin from outlets not normally used to trading in digital assets.
+    Binance has run into problems implementing its own card idea, so Swipe’s knowledge of the debit card industry and how it ticks could help push the Binance Card onwards past the concept stage.
+    Ultimately, Binance hopes the purchase of Swipe will take cryptocurrencies to a more mainstream market. The collaboration could end up bridging the gap between fiat and digital assets by making payments and purchases in cryptocurrency accessible via traditional financial systems.
+    Swipe is undoubtedly a good match as its combination of digital wallet and Visa debit card features lets users buy, sell and convert cryptocurrencies. Users of Swipe can already pay with cryptocurrency in selected stores around the globe.
+    “To achieve our mission of making crypto more accessible to the masses, off-ramps are a key component as well. By giving users the ability to convert and spend crypto directly, and have merchants still seamlessly accept fiat, this will make the crypto experience much better for everyone,” said Binance CEO Changpeng Zhao.
+    Swipe has a growing profile in 31 countries across Europe and supports fiat transactions in Euros, British Pounds, US Dollars, Korean Won and Philippine Pesos. It has additional plans in place to launch in both Asia and North America.
+    Zhao, also known as CZ, recently highlighted the potential of payments using crypto in his Twitter feed, but conceded that with only 0.1% of people having crypto there was no real incentive for merchants to accept it. The CEO obviously hopes that buying Swipe will enable Binance to address the issue and incentivise merchants to become more open to accepting cryptocurrency.
+    Sign up to the TechRadar Pro newsletter to get all the top news, opinion, features and guidance your business needs to succeed!
+    Rob Clymo has been a tech journalist for more years than he can actually remember, having started out in the wacky world of print magazines before discovering the power of the internet. Since he's been all-digital he has run the Innovation channel during a few years at Microsoft as well as turning out regular news, reviews, features and other content for the likes of TechRadar, TechRadar Pro, Tom's Guide, Fit&Well, Gizmodo, Shortlist, Automotive Interiors World, Automotive Testing Technology International, Future of Transportation and Electric & Hybrid Vehicle Technology International. In the rare moments he's not working he's usually out and about on one of numerous e-bikes in his collection.
+
+  questions_and_answers:
+    - question: What is the significance of Binance acquiring Swipe, and how does it align with Binance’s goals?
+      answer: Binance acquired Swipe, a multi-currency digital wallet and Visa debit card platform, to strengthen its Binance Card initiative, which aims to allow users to spend cryptocurrencies like Bitcoin at traditional outlets. This acquisition aligns with Binance’s broader goal of mainstreaming cryptocurrency usage by bridging the gap between fiat and digital currencies, making crypto more accessible and usable in everyday transactions.
+
+    - question: What advantages does Swipe bring to Binance, and how might it help overcome previous hurdles?
+      answer: Swipe brings expertise in the debit card industry and a working infrastructure that already allows users to buy, sell, and convert crypto, and pay with crypto at selected stores globally. Binance had faced challenges implementing its own card system, so Swipe’s operational know-how could help Binance move beyond the concept stage and launch its crypto card at scale.
+
+    - question: What regions does Swipe currently operate in, and what are its future expansion plans?
+      answer: Swipe currently operates in 31 countries across Europe and supports fiat currencies like the Euro, British Pound, US Dollar, Korean Won, and Philippine Peso. It also has plans to expand into Asia and North America, which could significantly broaden Binance’s reach and user adoption in key global markets.
+
+- context: |
+    Penguins are the cutest looking creatures that have the warmest hearts in the coldest regions. Irony much?
+    Just like this one fact, here are some more interesting facts about penguins.
+    Scroll down to know more such facts.
+    1. They are called birds but instead of wings, they have flippers that help them swim better.
+    2. There are no penguins in the north pole.
+    3. Penguins can drink seawater safely because they have glands that gets rid of excess salt.
+    4. There are about 17 species of Penguins in the southern hemisphere.
+    5. The species called the Emperor Penguin is the tallest of all penguin species. They can stay underwater for around 20 minutes at a time.
+    6. To keep themselves warm in cold weather, Emperor penguins often huddle together.
+    7. The smallest species called the Little Blue Penguin is only about 16 inches tall.
+    8. The Gentoo is the fastest penguin species which can reach swimming speeds of up to 35 km/h.
+    9. Even penguins have knees but due to all the feathers, they can't be seen.
+    10. All but two species of penguins breed in large colonies of up to one thousand birds.
+    11. Though it varies from species to species, many penguins are likely to mate with the same member of the opposite sex season after season.
+    12. After observing sexual behaviours in penguins it was found that gay penguins exist.
+
+  questions_and_answers:
+    - question: Why are penguins considered birds even though they can't fly?
+      answer: Penguins are considered birds because they have feathers, lay eggs, and are warm-blooded vertebrates. However, instead of wings for flying, they have flippers, which make them excellent swimmers—adapted more for life in water than the air.
+
+    - question: What makes the Emperor Penguin unique among all penguin species?
+      answer: The Emperor Penguin is the tallest of all penguin species and can stay underwater for up to 20 minutes. To survive the harsh Antarctic cold, they often huddle together in large groups to conserve warmth.
+
+    - question: What surprising facts about penguins challenge common assumptions?
+      answer: |
+        1) There are no penguins at the North Pole, only in the Southern Hemisphere.
+        2) Penguins can safely drink seawater thanks to a special gland that removes excess salt.
+        3) They have knees, but they’re hidden beneath their dense feathers.
+        4) Even more surprising, same-sex pairings have been observed among penguins, showing that gay penguins exist.
+
+- context: |
+    India will face Bangladesh in its final Super Four contest at the Asia Cup 2023 in Colombo on Friday.
+    India has already qualified for the final of the competition after wins against Pakistan and Sri Lanka. Bangladesh lost both its Super Four matches against the same two opponents and is mathematically out of contention for a finals place.
+    What time will the IND vs BAN Asia Cup Super Four match start?
+    The India vs Bangladesh Asia Cup 2023 Super Four match will start at 3:00 PM IST on Friday, September 15.
+    Where can I watch the IND vs BAN Asia Cup Super Four match today?
+    The India vs Bangladesh Asia Cup 2023 match will be telecast live on the Star Sports network and will be streamed live on the Disney+ Hotstar app.
+    Where will the IND vs BAN Asia Cup Super Four match be played?
+    The India vs Bangladesh Asia Cup 2023 Super Four match will be played at the R Premadasa Stadium in Colombo.
+  questions_and_answers:
+    - question: When and where will the India vs Bangladesh Asia Cup 2023 Super Four match take place?
+      answer: The match will be played on Friday, September 15, at the R Premadasa Stadium in Colombo, starting at 3:00 PM IST.
+
+    - question: Where can fans watch the IND vs BAN Asia Cup 2023 Super Four match live?
+      answer: The match will be telecast live on the Star Sports network and streamed live on the Disney+ Hotstar app.
+
+    - question: What is the current standing of India and Bangladesh in the Super Four stage of the Asia Cup 2023?
+      answer: India has already qualified for the final after winning against Pakistan and Sri Lanka. Bangladesh is out of contention for a place in the final after losing both its Super Four matches.
