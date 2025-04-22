@@ -12,7 +12,7 @@
 - block_type: LLMBlock
   block_config:
     block_name: question_response_generation
-    model_id: "Qwen/Qwen2.5-1.5B-Instruct"
+    model_id: "ibm-granite/granite-3.3-2b-instruct"
     config_path: configs/knowledge/simple_generate_qa_translate.yaml
     output_cols:
       - question
