@@ -63,7 +63,7 @@ class TranslationBlock(Block):
             ).to(DEVICE)
         except Exception as e:
             raise ValueError(
-                f"Error loading TRANSLATOIN model {self.trans_model_id}: {e}"
+                f"Error loading translation model {self.trans_model_id}: {e}"
             )
 
         max_num_token_override = DEFAULT_MAX_NUM_TOKENS
@@ -107,26 +107,23 @@ class TranslationBlock(Block):
             gen_kwargs["max_tokens"] = int(gen_kwargs["max_tokens"])
         return gen_kwargs
 
-    def _generate(self, samples) -> list:
-        logger.debug(f"STARTING GENERATION FOR TRANSLATION Block:")
-        logger.debug(f"Generation arguments: {self.gen_kwargs}")
+    def _translate_samples(self, samples) -> list:
+        logger.debug(f"Starting translation...:")
+        logger.debug(f"Translation arguments: {self.gen_kwargs}")
 
         results = []
-        progress_bar = tqdm(
-            range(len(samples)), desc=f"{self.block_name} Prompt Generation"
-        )
+        progress_bar = tqdm(range(len(samples)), desc=f"{self.block_name} Translation")
         for sample in samples:
 
             columns_to_translate = [sample[key] for key in self.block_config.keys()]
 
-            for _ in range(self.gen_kwargs.get("n", 1)):
-                translated_texts = []
+            translated_texts = []
 
-                for text in columns_to_translate:
-                    translated_texts.append(self._translate(text))
+            for text in columns_to_translate:
+                translated_texts.append(self._translate(text))
 
-                results.append(translated_texts)
-                progress_bar.update(1)
+            results.append(translated_texts)
+            progress_bar.update(1)
         return results
 
     def generate(self, samples: Dataset) -> Dataset:
@@ -165,7 +162,7 @@ class TranslationBlock(Block):
 
         # generate the output
 
-        outputs = self._generate(samples)
+        outputs = self._translate_samples(samples)
 
         num_parallel_samples = self.gen_kwargs.get("n", 1)
         extended_samples = []
