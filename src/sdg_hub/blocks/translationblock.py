@@ -4,14 +4,13 @@ import logging
 # Third Party
 from datasets import Dataset
 from tqdm import tqdm
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-import torch
+import openai
 
 # Local
 from .block import Block
+from ..logger_config import setup_logger
 from ..registry import BlockRegistry
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 logger = logging.getLogger(__name__)
 
 DEFAULT_MAX_NUM_TOKENS = 8192
@@ -28,6 +27,7 @@ class TranslationBlock(Block):
         self,
         block_name,
         config_path,
+        client,
         output_cols,
         trans_model_id=None,
         source_lang="eng_Latn",
@@ -41,7 +41,12 @@ class TranslationBlock(Block):
         self.block_config = self._load_config(config_path)
         self.source_lang = source_lang
         self.target_lang = target_lang
-        self.trans_model_id = trans_model_id
+        self.client = client
+        if trans_model_id:
+            self.trans_model_id = trans_model_id
+        else:
+            # get the default model id from client
+            self.trans_model_id = self.client.models.list().data[0].id
         self.output_cols = output_cols
         self.batch_params = batch_kwargs
         self.parser_name = parser_kwargs.get("parser_name", None)
@@ -52,28 +57,6 @@ class TranslationBlock(Block):
             "max_tokens": 4096,
         }
 
-        # Load tokenizer and model for translation
-        try:
-            logger.warn(f"Loading {self.trans_model_id} model...")
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                self.trans_model_id, src_lang=self.source_lang
-            )
-            self.trans_model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.trans_model_id
-            ).to(DEVICE)
-        except Exception as e:
-            raise ValueError(
-                f"Error loading translation model {self.trans_model_id}: {e}"
-            )
-
-        max_num_token_override = DEFAULT_MAX_NUM_TOKENS
-        self.gen_kwargs = self._gen_kwargs(
-            max_num_token_override,
-            gen_kwargs,
-            model=self.trans_model_id,
-            temperature=0,
-            max_tokens=DEFAULT_MAX_NUM_TOKENS,
-        )
         # Whether the LLM server supports a list of input prompts
         # and supports the n parameter to generate n outputs per input
         self.server_supports_batched = False
@@ -81,35 +64,21 @@ class TranslationBlock(Block):
     def _translate(self, text: str) -> str:
         """Translates a single string and returns the translated text."""
         logging.debug(f"Translating text using model {self.trans_model_id}")
-        encoded_input = self.tokenizer([text], return_tensors="pt").to(DEVICE)
-        with torch.no_grad():
-            translated_tokens = self.trans_model.generate(
-                **encoded_input,
-                forced_bos_token_id=self.tokenizer.convert_tokens_to_ids(
-                    self.target_lang
-                ),
-                max_length=1024,
-            )
 
-        translation = self.tokenizer.batch_decode(
-            translated_tokens, skip_special_tokens=True
-        )[0]
-        return translation
+        response = self.client.completions.create(
+            model=self.trans_model_id,
+            prompt=text,
+            extra_body={
+                "source_lang": self.source_lang,
+                "target_lang": self.target_lang,
+                "max_length": 512,
+            },
+        )
 
-    def _gen_kwargs(self, max_num_token_override, gen_kwargs, **defaults):
-        gen_kwargs = {**defaults, **gen_kwargs}
-        gen_kwargs["n"] = 1
-        if "temperature" in gen_kwargs:
-            gen_kwargs["temperature"] = float(gen_kwargs["temperature"])
-        if max_num_token_override != DEFAULT_MAX_NUM_TOKENS:
-            gen_kwargs["max_tokens"] = max_num_token_override
-        elif "max_tokens" in gen_kwargs:
-            gen_kwargs["max_tokens"] = int(gen_kwargs["max_tokens"])
-        return gen_kwargs
+        return response.choices[0].text
 
     def _translate_samples(self, samples) -> list:
         logger.debug(f"Starting translation...:")
-        logger.debug(f"Translation arguments: {self.gen_kwargs}")
 
         results = []
         progress_bar = tqdm(range(len(samples)), desc=f"{self.block_name} Translation")
@@ -164,7 +133,7 @@ class TranslationBlock(Block):
 
         outputs = self._translate_samples(samples)
 
-        num_parallel_samples = self.gen_kwargs.get("n", 1)
+        num_parallel_samples = 1
         extended_samples = []
 
         # Duplicate each input sample n times, where n is the number

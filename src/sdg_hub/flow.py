@@ -13,7 +13,7 @@ import yaml
 from .registry import BlockRegistry, PromptRegistry
 from . import prompts
 from . import blocks
-
+from openai import OpenAI
 
 OPERATOR_MAP = {
     "operator.eq": operator.eq,
@@ -32,11 +32,13 @@ class Flow(ABC):
         self,
         llm_client,
         num_samples_to_generate: Optional[int] = None,
+        translation_client: Optional[OpenAI] = None,
     ) -> None:
         self.llm_client = llm_client
         self.num_samples_to_generate = num_samples_to_generate
         self.base_path = str(resources.files(__package__))
         self.registered_blocks = BlockRegistry.get_registry()
+        self.translation_client = translation_client
 
     def _getFilePath(self, dirs, filename):
         """
@@ -102,6 +104,8 @@ class Flow(ABC):
 
                 if self.num_samples_to_generate is not None:
                     block["num_samples"] = self.num_samples_to_generate
+            elif "TranslationBlock" in block["block_type"]:
+                block["block_config"]["client"] = self.translation_client
 
             # update block type to llm class instance
             try:

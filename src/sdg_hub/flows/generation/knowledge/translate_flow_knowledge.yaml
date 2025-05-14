@@ -5,9 +5,10 @@
     output_cols:
     - document_translated
     source_lang: "hin_Deva"  # Source language (Hindi)
-    target_lang: "eng_Latn"  # Target language (ENglish)
+    target_lang: "eng_Latn"  # Target language (English)
     trans_model_id: facebook/nllb-200-distilled-600M
     prompt_struct: "{document}"
+    client: http://localhost:8000/v1
 
 - block_type: LLMBlock
   block_config:
@@ -24,7 +25,7 @@
         - "[END]"
         - "[End]"
   gen_kwargs:
-    max_tokens: 2048
+    max_tokens: 512
     temperature: 0.7
 
 - block_type: TranslationBlock

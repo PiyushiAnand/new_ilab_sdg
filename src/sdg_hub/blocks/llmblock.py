@@ -247,11 +247,12 @@ class ConditionalLLMBlock(LLMBlock):
             for config_key, config in config_paths.items():
                 # Template(self.prompt_struct.format(**filtered_config))
                 filtered_config = {
-                    k: (v if v is not None else "") for k, v in self.block_config.items()
+                    k: (v if v is not None else "")
+                    for k, v in self.block_config.items()
                 }
-                self.prompt_template[config_key] = Template(self.prompt_struct.format(
-                    **self._load_config(config)
-                ))
+                self.prompt_template[config_key] = Template(
+                    self.prompt_struct.format(**self._load_config(config))
+                )
 
     def _format_prompt(self, sample: Dict) -> str:
         if isinstance(self.prompt_template, dict):
@@ -380,7 +381,7 @@ class LLMMessagesBlock(Block):
         client,
         input_col,
         output_col,
-        model_prompt=None, 
+        model_prompt=None,
         model_id=None,
         **batch_kwargs,
     ) -> None:
@@ -395,7 +396,7 @@ class LLMMessagesBlock(Block):
             self.model = model_id
         else:
             self.model = self.client.models.list().data[0].id
-        
+
         self.defaults = {
             "model": self.model,
             "temperature": 0,
@@ -417,7 +418,9 @@ class LLMMessagesBlock(Block):
         results = []
         n = gen_kwargs.get("n", 1)
         for message in messages:
-            responses = self.client.chat.completions.create(messages=message, **generate_args)
+            responses = self.client.chat.completions.create(
+                messages=message, **generate_args
+            )
             if n > 1:
                 results.append([choice.message.content for choice in responses.choices])
             else:
