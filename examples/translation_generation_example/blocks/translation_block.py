@@ -1,43 +1,27 @@
-# Standard
+# First Party
+from sdg_hub.logger_config import setup_logger
+from sdg_hub.blocks import BlockRegistry, Block
 import logging
-
-# Third Party
 from datasets import Dataset
 from tqdm import tqdm
-import openai
 
-# Local
-from .block import Block
-from ..logger_config import setup_logger
-from ..registry import BlockRegistry
-
-logger = logging.getLogger(__name__)
-
-DEFAULT_MAX_NUM_TOKENS = 8192
-
-
-# This is part of the public API.
+logger = setup_logger(__name__)
 
 
 @BlockRegistry.register("TranslationBlock")
-# pylint: disable=dangerous-default-value
 class TranslationBlock(Block):
-    # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
-        block_name,
+        block_name: str,
         config_path,
         client,
         output_cols,
         trans_model_id=None,
         source_lang="eng_Latn",
         target_lang="hin_Deva",
-        prompt_struct=None,
-        gen_kwargs={},
-        parser_kwargs={},
-        batch_kwargs={},
+        **batch_kwargs,
     ) -> None:
-        super().__init__(block_name)
+        super().__init__(block_name=block_name)
         self.block_config = self._load_config(config_path)
         self.source_lang = source_lang
         self.target_lang = target_lang
@@ -48,10 +32,6 @@ class TranslationBlock(Block):
             # get the default model id from client
             self.trans_model_id = self.client.models.list().data[0].id
         self.output_cols = output_cols
-        self.batch_params = batch_kwargs
-        self.parser_name = parser_kwargs.get("parser_name", None)
-        self.parsing_pattern = parser_kwargs.get("parsing_pattern", None)
-        self.parser_cleanup_tags = parser_kwargs.get("parser_cleanup_tags", None)
         self.defaults = {
             "temperature": 0,
             "max_tokens": 4096,
@@ -97,19 +77,12 @@ class TranslationBlock(Block):
 
     def generate(self, samples: Dataset) -> Dataset:
         """
-        Generate the output from the block. This method should first validate the input data,
-        then generate the output, and finally parse the generated output before returning it.
+        Generate the output from the block.
         Args:
             samples (Dataset): The samples used as input data
         Returns:
             The parsed output after generation.
         """
-
-        num_samples = self.batch_params.get("num_samples", None)
-        logger.debug("Generating outputs for {} samples".format(len(samples)))
-
-        if (num_samples is not None) and ("num_samples" not in samples.column_names):
-            samples = samples.add_column("num_samples", [num_samples] * len(samples))
 
         # validate each sample
         # Log errors and remove invalid samples
@@ -133,17 +106,8 @@ class TranslationBlock(Block):
 
         outputs = self._translate_samples(samples)
 
-        num_parallel_samples = 1
-        extended_samples = []
-
-        # Duplicate each input sample n times, where n is the number
-        # of output sequences generated per input, so that we can
-        # pair up the inputs and outputs.
-        for item in samples:
-            extended_samples.extend([item] * num_parallel_samples)
-
         new_data = []
-        for sample, output in zip(extended_samples, outputs):
+        for sample, output in zip(samples, outputs):
 
             translated_data = {}
 
