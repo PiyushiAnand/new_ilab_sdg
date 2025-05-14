@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Standard
-from collections import Counter
 from typing import Any, Dict, List
+from typing import Optional
 import json
 import re
 
@@ -84,6 +84,27 @@ class LLMBlock(Block):
         # and supports the n parameter to generate n outputs per input
         self.server_supports_batched = server_supports_batched(client, self.model)
 
+
+    def _extract_matches(
+        self, text: str, start_tag: Optional[str], end_tag: Optional[str]
+    ) -> List[str]:
+        if not text:
+            return []
+        if not start_tag and not end_tag:
+            return [text.strip()]
+
+        pattern = ""
+        if start_tag:
+            pattern += re.escape(start_tag)
+        pattern += r"(.*?)"
+        if end_tag:
+            pattern += re.escape(end_tag)
+        elif start_tag:
+            # Enforce matching till end of string when only start_tag is provided.
+            pattern += "$"
+
+        return [match.strip() for match in re.findall(pattern, text, re.DOTALL)]
+
     def _parse(self, generated_string) -> dict:
         matches = {}
 
@@ -108,16 +129,9 @@ class LLMBlock(Block):
                 self.block_config.get("end_tags", []),
                 self.output_cols,
             ):
-                if not start_tag and not end_tag:
-                    matches[output_col] = [
-                        generated_string.strip() if generated_string else None
-                    ]
-                else:
-                    pattern = re.escape(start_tag) + r"(.*?)" + re.escape(end_tag)
-                    all_matches = re.findall(pattern, generated_string, re.DOTALL)
-                    matches[output_col] = (
-                        [match.strip() for match in all_matches] if all_matches else []
-                    )
+                matches[output_col] = self._extract_matches(
+                    generated_string, start_tag, end_tag
+                )
 
         return matches
 
