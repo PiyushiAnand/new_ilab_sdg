@@ -35,7 +35,6 @@ from .prompts import *  # needed to register prompts
 from .registry import BlockRegistry, PromptRegistry
 from . import prompts
 from . import blocks
-from openai import OpenAI
 
 OPERATOR_MAP: Dict[str, Callable] = {
     "operator.eq": operator.eq,
