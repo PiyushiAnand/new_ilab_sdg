@@ -14,6 +14,7 @@ from .registry import BlockRegistry, PromptRegistry
 from . import prompts
 from . import blocks
 
+
 OPERATOR_MAP = {
     "operator.eq": operator.eq,
     "operator.ge": operator.ge,
