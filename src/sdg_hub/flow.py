@@ -36,7 +36,7 @@ from .registry import BlockRegistry, PromptRegistry
 from . import prompts
 from . import blocks
 
-OPERATOR_MAP: Dict[str, Callable] = {
+OPERATOR_MAP = {
     "operator.eq": operator.eq,
     "operator.ge": operator.ge,
     "operator.le": operator.le,
