@@ -13,7 +13,6 @@ import yaml
 from .registry import BlockRegistry, PromptRegistry
 from . import prompts
 from . import blocks
-from openai import OpenAI
 
 OPERATOR_MAP = {
     "operator.eq": operator.eq,
