@@ -33,12 +33,9 @@ from datasets.data_files import EmptyDatasetError
 from .blocks import *  # needed to register blocks
 from .prompts import *  # needed to register prompts
 from .registry import BlockRegistry, PromptRegistry
-from .logger_config import setup_logger
-
-from rich.console import Console
-from rich.table import Table
-
-logger = setup_logger(__name__)
+from . import prompts
+from . import blocks
+from openai import OpenAI
 
 OPERATOR_MAP: Dict[str, Callable] = {
     "operator.eq": operator.eq,
@@ -67,7 +64,7 @@ class Flow(ABC):
         self,
         llm_client: Any,
         num_samples_to_generate: Optional[int] = None,
-        log_level: Optional[str] = None
+        translation_client: Optional[OpenAI] = None,
     ) -> None:
         """
         Initialize the Flow class.
@@ -98,24 +95,11 @@ class Flow(ABC):
         self.llm_client = llm_client
         self.base_path = str(resources.files(__package__))
         self.registered_blocks = BlockRegistry.get_registry()
-        self.chained_blocks = None  # Will be set by get_flow_from_file
-        self.num_samples_to_generate = num_samples_to_generate
+        self.translation_client = translation_client
 
-        # Logging verbosity level
-        self.log_level = log_level or os.getenv("SDG_HUB_LOG_LEVEL", "normal").lower()
-        self.console = Console() if self.log_level in ["verbose", "debug"] else None
-
-    def _log_block_info(self, index: int, total: int, name: str, ds: Dataset, stage: str) -> None:
-        if self.log_level in ["verbose", "debug"] and self.console:
-            table = Table(title=f"{stage} Block {index+1}/{total}: {name}", show_header=True)
-            table.add_column("Metric", style="cyan", no_wrap=True)
-            table.add_column("Value", style="magenta")
-            table.add_row("Rows", str(len(ds)))
-            table.add_row("Columns", ", ".join(ds.column_names))
-            self.console.print(table)
-
-    def _getFilePath(self, dirs: List[str], filename: str) -> str:
-        """Find a named configuration file.
+    def _getFilePath(self, dirs, filename):
+        """
+        Find a named configuration file.
 
         Files are checked in the following order:
             1. Absolute path is always used
@@ -202,7 +186,9 @@ class Flow(ABC):
 
             # Logging: always show basic progress unless in quiet mode
             if self.log_level in ["normal", "verbose", "debug"]:
-                logger.info(f"🔄 Running block {i+1}/{len(self.chained_blocks)}: {name}")
+                logger.info(
+                    f"🔄 Running block {i+1}/{len(self.chained_blocks)}: {name}"
+                )
 
             # Log dataset shape before block (verbose/debug)
             self._log_block_info(i, len(self.chained_blocks), name, dataset, "Input")
@@ -291,6 +277,8 @@ class Flow(ABC):
 
                 if self.num_samples_to_generate is not None:
                     block["num_samples"] = self.num_samples_to_generate
+            elif "TranslationBlock" in block["block_type"]:
+                block["block_config"]["client"] = self.translation_client
 
             # update block type to llm class instance
             try:
