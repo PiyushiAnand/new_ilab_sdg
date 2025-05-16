@@ -1,14 +1,13 @@
 - block_type: LLMBlock
   block_config:
-    block_name: question_response_generation
-    model_id: "ibm-granite/granite-3.3-2b-instruct"
-    config_path: configs/simple_generate_qa.yaml
+    block_name: scenario_generation
+    model_id: "ibm-granite/granite-3.3-8b-instruct"
+    config_path: configs/generate_scenario.yaml
     output_cols:
       - scenario
-      - response
     parser_kwargs:
       parser_name: custom
-      parsing_pattern: (?:Scenario|SCENARIO)\:\s*(.*?)\s*(?:Response|RESPONSE)\:\s*(.*)
+      parsing_pattern: (?:Scenario|SCENARIO):\s*(.*)
       parser_cleanup_tags:
         - "[END]"
         - "[End]"
@@ -16,13 +15,24 @@
     max_tokens: 512
     temperature: 0.7
 
-- block_type: TranslationBlock
+- block_type: LLMBlock
   block_config:
-    block_name: question_response_translation
-    config_path: configs/translate_question_response.yaml
+    block_name: response_generation
+    model_id: "ibm-granite/granite-3.3-8b-instruct"
+    config_path: configs/generate_response.yaml
     output_cols:
-    - scenario_translated
-    - response_translated
-    source_lang: "eng_Latn"  # Source language (English)
-    target_lang: "kan_Knda"  # Target language (Kannada)
-    trans_model_id: facebook/nllb-200-distilled-600M
+      - response
+  gen_kwargs:
+    max_tokens: 512
+    temperature: 0.7
+
+# - block_type: TranslationBlock
+#   block_config:
+#     block_name: question_response_translation
+#     config_path: configs/translate_question_response.yaml
+#     output_cols:
+#     - scenario_translated
+#     - response_translated
+#     source_lang: "eng_Latn"  # Source language (English)
+#     target_lang: "kan_Knda"  # Target language (Kannada)
+#     trans_model_id: facebook/nllb-200-distilled-600M

@@ -41,8 +41,6 @@ print(f"Read {len(bns_documents)} number of Sections")
 
 bns_documents_chunked = []
 
-max_documents = 100
-doc_count = 0
 for each_doc in tqdm(bns_documents, desc="For each document"):
     document = [
         {
@@ -57,29 +55,47 @@ for each_doc in tqdm(bns_documents, desc="For each document"):
         )
     ]
     bns_documents_chunked.extend(document)
-    doc_count += 1
-
-    if doc_count > max_documents:
-        break
 
 print(f"Chunked data into {len(bns_documents_chunked)} chunks")
 
 doc_with_icl = []
 
-icl_context = """
-Section 49: Punishment of abetment if act abetted is committed in consequence and where no express provision is made for its punishment Whoever abets any offence shall, if the act abetted is committed in consequence of the abetment, and no express provision is made by this Sanhita for the punishment of such abetment, be punished with the punishment provided for the offence. Explanation: An act or offence is said to be committed in consequence of abetment, when it is committed in consequence of the instigation, or in pursuance of the conspiracy, or with the aid which constitutes the abetment. Illustrations. (a) A instigates B to give false evidence. B, in consequence of the instigation, commits that offence. A is guilty of abetting that offence, and is liable to the same punishment as B. (b) A and B conspire to poison Z. A, in pursuance of the conspiracy, procures the poison and delivers it to B in order that he may administer it to Z. B, in pursuance of the conspiracy, administers the poison to Z in As absence and thereby causes Zs death. Here B is guilty of murder. A is guilty of abetting that offence by conspiracy, and is liable to the punishment for murder.
+icl_context_1 = """
+CHAPTER IV: OF ABETMENT, CRIMINAL CONSPIRACY AND ATTEMPT
+Section 49: 
+Punishment of abetment if act abetted is committed in consequence and where no express provision is made for its punishment Whoever abets any offence shall, if the act abetted is committed in consequence of the abetment, and no express provision is made by this Sanhita for the punishment of such abetment, be punished with the punishment provided for the offence. Explanation: An act or offence is said to be committed in consequence of abetment, when it is committed in consequence of the instigation, or in pursuance of the conspiracy, or with the aid which constitutes the abetment. Illustrations. (a) A instigates B to give false evidence. B, in consequence of the instigation, commits that offence. A is guilty of abetting that offence, and is liable to the same punishment as B. (b) A and B conspire to poison Z. A, in pursuance of the conspiracy, procures the poison and delivers it to B in order that he may administer it to Z. B, in pursuance of the conspiracy, administers the poison to Z in As absence and thereby causes Zs death. Here B is guilty of murder. A is guilty of abetting that offence by conspiracy, and is liable to the punishment for murder.
 """
+
+icl_scenario_1 = "If I encouraged someone to commit a crime and they actually went ahead and did it, but I wasn’t physically present at the scene, can I still be punished the same as the person who committed the crime under Indian law?"
+
+icl_response_1 = "Based on Chapter Chapter IV and section 49 of Bharatiya Nyaya Sanhita, Yes, you can still be punished the same as the person who committed the crime."
+
+
+icl_context_1 = """
+CHAPTER IV: OF ABETMENT, CRIMINAL CONSPIRACY AND ATTEMPT
+Section 49: 
+Punishment of abetment if act abetted is committed in consequence and where no express provision is made for its punishment Whoever abets any offence shall, if the act abetted is committed in consequence of the abetment, and no express provision is made by this Sanhita for the punishment of such abetment, be punished with the punishment provided for the offence. Explanation: An act or offence is said to be committed in consequence of abetment, when it is committed in consequence of the instigation, or in pursuance of the conspiracy, or with the aid which constitutes the abetment. Illustrations. (a) A instigates B to give false evidence. B, in consequence of the instigation, commits that offence. A is guilty of abetting that offence, and is liable to the same punishment as B. (b) A and B conspire to poison Z. A, in pursuance of the conspiracy, procures the poison and delivers it to B in order that he may administer it to Z. B, in pursuance of the conspiracy, administers the poison to Z in As absence and thereby causes Zs death. Here B is guilty of murder. A is guilty of abetting that offence by conspiracy, and is liable to the punishment for murder.
+"""
+
+icl_scenario_1 = "If I encouraged someone to commit a crime and they actually went ahead and did it, but I wasn’t physically present at the scene, can I still be punished the same as the person who committed the crime under Indian law?"
+
+icl_response_1 = "Based on Chapter Chapter IV and section 49 of Bharatiya Nyaya Sanhita, Yes, you can still be punished the same as the person who committed the crime."
+
+icl_scenario_2 = "If a senior executive's instructions or influence lead an employee to commit a wrongful act, could the executive be held criminally liable even if they weren’t directly involved in carrying it out?"
+
+icl_response_2 = "Yes, under Chapter IV, Section 49 of the Bharatiya Nyaya Sanhita, if a senior executive instigates, conspires with, or provides aid that leads to the commission of an offence by an employee, they can be held criminally liable for abetment. This applies even if they were not directly involved in committing the act. If the offence was committed as a consequence of the abetment and there is no specific provision prescribing punishment for such abetment, the executive would be liable for the same punishment as the principal offender."
 
 for each_document in bns_documents_chunked:
     icl_dict = {}
-    icl_dict["icl_document"] = icl_context
+    icl_dict["icl_document_1"] = icl_context_1
 
-    icl_dict["icl_query"] = (
-        "If I encouraged someone to commit a crime and they actually went ahead and did it, but I wasn’t physically present at the scene, can I still be punished the same as the person who committed the crime under Indian law?"
-    )
-    icl_dict["icl_response"] = (
-        f"Based on Chapter {each_document['chapter_name']} and section {each_document['section_name']} of Bharatiya Nyaya Sanhita, Yes, you can still be punished the same as the person who committed the crime."
-    )
+    icl_dict["icl_query_1"] = icl_scenario_1
+    icl_dict["icl_response_1"] = icl_response_1
+
+    icl_dict["icl_document_2"] = icl_context_1
+
+    icl_dict["icl_query_2"] = icl_scenario_2
+    icl_dict["icl_response_2"] = icl_response_2
 
     icl_dict["chapter_name"] = each_document["chapter_name"]
     icl_dict["section_name"] = each_document["section_name"]
