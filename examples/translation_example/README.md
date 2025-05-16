@@ -1,6 +1,6 @@
-# Synthetic Scenario-Response Generation for Legal Retrieval
+# Synthetic Question-Answer Generation over Wikipedia Documents
 
-This notebook demonstrates how to use the `sdg` package to generate synthetic scenario-response data with Granite 3.3 2B as the teacher model and Facebook NLLB translation model. The generated data is in Kannada and can be used to improve retriever capability in the legal domain as well as legal question-answering systems.
+This notebook demonstrates how to use the `sdg` package to generate synthetic question-answer pairs using Kannada Wikipedia with Granite 3.3 2B as the teacher model. Since Granite 3.3 2B doesn't support Kannada we translate the wikipedia documents to ENglish, generate question-answer pairs in ENglish and translated the generated question-answer pairs back to Kannada. We use Facebook NLLB translation model. 
 
 ## Table of Contents
 - [Overview](#overview)
@@ -20,25 +20,31 @@ The workflow includes:
 
 ```mermaid
 graph LR
-    A[Input Section] --> B[Scenario Generation]
-    B --> C[Response Generation]
-    C --> D[Scenario and Response Tranlation]
+    A[Input Wikipedia Passage] --> B[Kannada Passage Translation to English]
+    B --> C[Question Generation]
+    C --> D[Answer Generation]
+    D --> E[Question and Answer Translation to Kannada]
 ```
 
-### Scenario-Response Generation
+### Kannada Passage Translation to English
+We use Facebook's `facebook/nllb-200-distilled-600M` model to translate Kannada Wikipedia passages to English.
 
-* Our SDG pipeline leverages the generation capabilities of language models to generate a diverse set of scenrios and responses for the provided sections from Bharatiya Nyaya Sanhita.
-* Scenario represents real-life questions which a common person might ask a lawyer.
+### Question Generation
 
-### Scenario-Response Translation
+* Our SDG pipeline leverages the generation capabilities of language models to generate a diverse set of question and answers based on the translated passages.
 
-* Once we generate scenarios and responses, they are translated to Kannada using Facebook NLLB translation model.
+### Answer Generation
+
+* Once we generate questions, we leverages the generation capabilities of language models to generate answer to the question grounded on the document.
+
+### Question-Answer Translation
+We use Facebook's `facebook/nllb-200-distilled-600M` model to translate generated question-answer pairs back to Kannada.
 
 ## Notebook Structure
 The notebook is logically divided in below sections:
 ### Creating ICLs
-- SDG works by creating a set Scenario-Response pairs from the source document.
-- To do this we first need to create an example document and a set of Scenario-Response pairs. The SDG will use these to generate more synthetic Scenario-Response pairs on top of all your document.
+- SDG works by creating a set Question-Answer pairs from the source document.
+- To do this we first need to create an example document and a set of Question-Answer pairs. The SDG will use these to generate more synthetic Question-Answer pairs on top of all your document.
 
 ### Generating Data
 - In next few sections you will:
@@ -59,14 +65,14 @@ not extend to (a) the intentional causing of death, or to the attempting to caus
 
 ### Generated data
 
-#### Generated Scenario-Response Pair
+#### Generated Question-Answer Pair
 ```text
 Scenario: Suppose I urge my friend C to steal a car from a dealership, knowing full well it's illegal. Although I don't physically assist in the theft, C goes ahead and takes the vehicle. Can I face the same legal repercussions for abetting this crime under the Bharatiya Nyaya Sanhita?
 
 Response: In accordance with Chapter III, Section 27 of the Bharatiya Nyaya Sanhita, yes, you can be held equally liable as the perpetrator under such circumstances. This principle applies to situations where an individual intentionally abets a crime, including the act of theft in this case, even when they do not physically participate in the commission.
 ```
 
-#### Translated Scenario-Response Pair
+#### Translated Question-Answer Pair
 ```text
 Scenario:
 
