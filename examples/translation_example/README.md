@@ -27,7 +27,7 @@ graph LR
 ```
 
 ### Kannada Passage Translation to English
-We use Facebook's `facebook/nllb-200-distilled-600M` model to translate Kannada Wikipedia passages to English.
+We use Facebook's `facebook/nllb-200-1.3B` model to translate Kannada Wikipedia passages to English.
 
 ### Question Generation
 
@@ -38,7 +38,7 @@ We use Facebook's `facebook/nllb-200-distilled-600M` model to translate Kannada 
 * Once we generate questions, we leverages the generation capabilities of language models to generate answer to the question grounded on the document.
 
 ### Question-Answer Translation
-We use Facebook's `facebook/nllb-200-distilled-600M` model to translate generated question-answer pairs back to Kannada.
+We use Facebook's `facebook/nllb-200-1.3B` model to translate generated question-answer pairs back to Kannada.
 
 ## Notebook Structure
 The notebook is logically divided in below sections:
@@ -46,12 +46,12 @@ The notebook is logically divided in below sections:
 - SDG works by creating a set Question-Answer pairs from the source document.
 - To do this we first need to create an example document and a set of Question-Answer pairs. The SDG will use these to generate more synthetic Question-Answer pairs on top of all your document.
 
-### Generating Data
+<!-- ### Generating Data
 - In next few sections you will:
     - Learn how we added prompts for the teacher model
-    - Generated data
+    - Generated data -->
 
-## How does the generated data look like?
+<!-- ## How does the generated data look like?
 
 #### Input Raw Document
 ```text
@@ -78,5 +78,5 @@ Scenario:
 
 
 Response:
-```
+``` -->
 

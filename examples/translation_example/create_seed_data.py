@@ -13,7 +13,7 @@ kannada_wiki = load_dataset("wikimedia/wikipedia", "20231101.kn")["train"]
 
 kannada_documents = []
 
-max_documents = 100
+max_documents = 1000
 doc_count = 0
 for each_doc in tqdm(kannada_wiki, desc="For each document"):
     document = [
