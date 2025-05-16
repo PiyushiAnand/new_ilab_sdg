@@ -15,19 +15,13 @@ examples: |
 
   Here are some examples to help you understand the type of questions that are asked for this document:
 
-  Question: {{icl_query_1}}
-  Response: {{icl_response_1}}
-
-  Question: {{icl_query_2}}
-  Response: {{icl_response_2}}
-
-  Question: {{icl_query_3}}
-  Response: {{icl_response_3}}
+  Question: {{icl_query}}
+  Response: {{icl_response}}
 
   Here is the document:
 
-  {{document_outline}}
-  {{document_translated}}
+  {{title_translated}}
+  {{text_translated}}
 
   Question: {{question}}
 

@@ -16,16 +16,12 @@ examples: |
 
   Here are some examples to help you understand the type of questions that are asked for this document:
 
-  Question: {{icl_query_1}}
-  
-  Question: {{icl_query_2}}
-  
-  Question: {{icl_query_3}}
+  Question: {{icl_query}}
   
   Here is the document:
 
-  {{document_outline}}
-  {{document_translated}}
+  {{title_translated}}
+  {{text_translated}}
 
 generation: |
   Provide a single question based on the document.

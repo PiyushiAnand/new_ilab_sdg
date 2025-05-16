@@ -112,7 +112,9 @@ def main(
 
     if debug:
         # For debugging, use a smaller subset of the dataset
-        ds = ds.shuffle(seed=42).select(range(30))
+        ds = ds.shuffle(seed=42).select(range(5))
+
+    logger.warning(f"Dataset: {ds}")
 
     openai_api_key = "EMPTY"
     llm_openai_api_base = llm_endpoint
@@ -151,7 +153,7 @@ def main(
     save_path = save_path.replace(
         ".jsonl", f"_{dataset_start_index}_{dataset_end_index}.jsonl"
     )
-    generated_data.to_json(save_path, orient="records", lines=True)
+    generated_data.to_json(save_path, orient="records", lines=True, force_ascii=False)
     logger.info(f"Data saved to {save_path}")
 
 
