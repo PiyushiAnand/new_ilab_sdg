@@ -7,7 +7,7 @@
     - title_translated
     source_lang: "kan_Knda"  # Source language (Kannada)
     target_lang: "eng_Latn"  # Target language (English)
-    trans_model_id: facebook/nllb-200-distilled-600M
+    trans_model_id: facebook/nllb-200-1.3B
     client: http://localhost:8000/v1
 
 - block_type: LLMBlock
@@ -53,4 +53,4 @@
     - response_translated
     source_lang: "eng_Latn"  # Source language (English)
     target_lang: "kan_Knda"  # Target language (Kannada)
-    trans_model_id: facebook/nllb-200-distilled-600M
+    trans_model_id: facebook/nllb-200-1.3B

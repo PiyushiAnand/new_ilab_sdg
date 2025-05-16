@@ -6,7 +6,7 @@ import torch
 app = FastAPI()
 
 # Load the model and tokenizer
-MODEL_NAME = "facebook/nllb-200-distilled-600M"
+MODEL_NAME = "facebook/nllb-200-1.3B"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
 
@@ -33,6 +33,41 @@ async def translate(req: CompletionRequest):
             **inputs,
             forced_bos_token_id=tokenizer.convert_tokens_to_ids(req.target_lang),
             max_length=req.max_length,
+        )
+
+    # Decode output
+    translated_text = tokenizer.batch_decode(output_tokens, skip_special_tokens=True)[0]
+
+    # Return response in OpenAI-style format
+    return {
+        "id": "nllb-translation",
+        "object": "text_completion",
+        "model": MODEL_NAME,
+        "choices": [
+            {
+                "text": translated_text,
+                "index": 0,
+                "logprobs": None,
+                "finish_reason": "stop",
+            }
+        ],
+    }
+
+
+@app.get("/v1/completions")
+async def translate(source_lang: str, target_lang: str, prompt: str):
+    # Set source and target language
+    tokenizer.src_lang = source_lang
+
+    # Tokenize input
+    inputs = tokenizer(prompt, return_tensors="pt")
+
+    # Generate translation
+    with torch.no_grad():
+        output_tokens = model.generate(
+            **inputs,
+            forced_bos_token_id=tokenizer.convert_tokens_to_ids(target_lang),
+            max_length=512,
         )
 
     # Decode output

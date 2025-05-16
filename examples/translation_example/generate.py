@@ -112,7 +112,7 @@ def main(
 
     if debug:
         # For debugging, use a smaller subset of the dataset
-        ds = ds.shuffle(seed=42).select(range(5))
+        ds = ds.shuffle(seed=42).select(range(100))
 
     logger.warning(f"Dataset: {ds}")
 
