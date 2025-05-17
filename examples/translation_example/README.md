@@ -1,10 +1,10 @@
 # Synthetic Question-Answer Generation over Wikipedia Documents
 
-This notebook demonstrates how to use the `sdg` package to generate synthetic question-answer pairs using Kannada Wikipedia with Granite 3.3 2B as the teacher model. Since Granite 3.3 2B doesn't support Kannada we translate the wikipedia documents to ENglish, generate question-answer pairs in ENglish and translated the generated question-answer pairs back to Kannada. We use Facebook NLLB translation model. 
+This notebook demonstrates how to use the `sdg` package to generate synthetic question-answer pairs using Kannada Wikipedia with Granite 3.3 2B as the teacher model. Since Granite 3.3 2B doesn't support Kannada we translate the wikipedia documents to English, generate question-answer pairs in English and translated the generated question-answer pairs back to Kannada. We will use [IndicTrans v2 translation model](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface) for the same. 
 
 ## Table of Contents
 - [Overview](#overview)
-- [Generation Pipeline Overview](#reasoning-pipeline-overview)
+- [Generation Pipeline Overview](#generation-pipeline-overview)
 - [Notebook Structure](#notebook-structure)
   - [Creating ICLs](#creating-icls)
   - [Generating Data](#generating-data)
@@ -27,7 +27,7 @@ graph LR
 ```
 
 ### Kannada Passage Translation to English
-We use Facebook's `facebook/nllb-200-1.3B` model to translate Kannada Wikipedia passages to English.
+We use IndicTrans v2, specifically `ai4bharat/indictrans2-indic-en-dist-200M` model to translate Kannada Wikipedia passages to English.
 
 ### Question Generation
 
@@ -37,46 +37,36 @@ We use Facebook's `facebook/nllb-200-1.3B` model to translate Kannada Wikipedia 
 
 * Once we generate questions, we leverages the generation capabilities of language models to generate answer to the question grounded on the document.
 
-### Question-Answer Translation
-We use Facebook's `facebook/nllb-200-1.3B` model to translate generated question-answer pairs back to Kannada.
+### Question and Answer Translation to Kannada
+We use IndicTrans v2 `ai4bharat/indictrans2-en-indic-dist-200M` model to translate generated question-answer pairs back to Kannada.
 
-## Notebook Structure
-The notebook is logically divided in below sections:
-### Creating ICLs
-- SDG works by creating a set Question-Answer pairs from the source document.
-- To do this we first need to create an example document and a set of Question-Answer pairs. The SDG will use these to generate more synthetic Question-Answer pairs on top of all your document.
-
-<!-- ### Generating Data
-- In next few sections you will:
-    - Learn how we added prompts for the teacher model
-    - Generated data -->
-
-<!-- ## How does the generated data look like?
+## How does the generated data look like?
 
 #### Input Raw Document
 ```text
-"Chapter_III
-
-Section_27
-
-not extend to (a) the intentional causing of death, or to the attempting to cause death; (b) the doing of anything which the person doing it knows to be likely to cause
+ಎಸ್.ನಿಜಲಿಂಗಪ್ಪ
+ಕರ್ನಾಟಕದ ಏಕೀಕರಣಕ್ಕೆ ಹೋರಾಡಿದ ರಾಜಕಾರಣಿಗಳಲ್ಲಿ ಪ್ರಮುಖರು
 ```
 
-
-### Generated data
+#### Translated Document in English
+```text
+S. Nijalingappa
+Prominent among the politicians who fought for the unification of Karnataka
+```
 
 #### Generated Question-Answer Pair
 ```text
-Scenario: Suppose I urge my friend C to steal a car from a dealership, knowing full well it's illegal. Although I don't physically assist in the theft, C goes ahead and takes the vehicle. Can I face the same legal repercussions for abetting this crime under the Bharatiya Nyaya Sanhita?
+Question: Who was a prominent politician known for fighting for the unification of Karnataka, as mentioned in the document?
 
-Response: In accordance with Chapter III, Section 27 of the Bharatiya Nyaya Sanhita, yes, you can be held equally liable as the perpetrator under such circumstances. This principle applies to situations where an individual intentionally abets a crime, including the act of theft in this case, even when they do not physically participate in the commission.
+Answer: S. Nijalingappa
 ```
 
 #### Translated Question-Answer Pair
 ```text
-Scenario:
+Question: 
+ಡಾಕ್ಯುಮೆಂಟ್ನಲ್ಲಿ ಉಲ್ಲೇಖಿಸಿರುವಂತೆ, ಕರ್ನಾಟಕದ ಏಕೀಕರಣಕ್ಕಾಗಿ ಹೋರಾಡಿದ ಪ್ರಸಿದ್ಧ ರಾಜಕಾರಣಿ ಯಾರು?
 
-
-Response:
-``` -->
+Answer:
+ಎಸ್.ನಿಜಲಿಂಪ್ಪ
+```
 
