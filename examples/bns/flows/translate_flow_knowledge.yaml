@@ -26,13 +26,14 @@
     max_tokens: 512
     temperature: 0.7
 
-# - block_type: TranslationBlock
-#   block_config:
-#     block_name: question_response_translation
-#     config_path: configs/translate_question_response.yaml
-#     output_cols:
-#     - scenario_translated
-#     - response_translated
-#     source_lang: "eng_Latn"  # Source language (English)
-#     target_lang: "kan_Knda"  # Target language (Kannada)
-#     trans_model_id: facebook/nllb-200-distilled-600M
+- block_type: TranslationBlock
+  block_config:
+    block_name: scenario_response_translation
+    config_path: configs/translate_scenario_response.yaml
+    output_cols:
+    - scenario_translated
+    - response_translated
+    source_lang: "eng_Latn"  # Source language (English)
+    target_lang: "kan_Knda"  # Target language (Kannada)
+    trans_model_id: ai4bharat/indictrans2-indic-en-dist-200M
+    client: http://localhost:8000/v1

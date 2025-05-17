@@ -63,7 +63,6 @@ class TranslationBlock(Block):
         results = []
         progress_bar = tqdm(range(len(samples)), desc=f"{self.block_name} Translation")
         for sample in samples:
-
             columns_to_translate = [sample[key] for key in self.block_config.keys()]
 
             translated_texts = []

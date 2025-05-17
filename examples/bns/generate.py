@@ -144,7 +144,7 @@ def main(
     save_path = save_path.replace(
         ".jsonl", f"_{dataset_start_index}_{dataset_end_index}.jsonl"
     )
-    generated_data.to_json(save_path, orient="records", lines=True)
+    generated_data.to_json(save_path, orient="records", lines=True, force_ascii=False)
     logger.info(f"Data saved to {save_path}")
 
 

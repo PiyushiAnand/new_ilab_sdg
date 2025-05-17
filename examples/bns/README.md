@@ -1,12 +1,12 @@
-# Synthetic Scenario-Response Generation for Legal Retrieval
+# Synthetic Question-Answer Generation over Wikipedia Documents
 
-This notebook demonstrates how to use the `sdg` package to generate synthetic scenario-response data with Granite 3.3 2B as the teacher model and Facebook NLLB translation model. The generated data is in Kannada and can be used to improve retriever capability in the legal domain as well as legal question-answering systems.
+This notebook demonstrates how to use the `sdg` package to generate synthetic question-answer pairs using Kannada Wikipedia with Granite 3.3 2B as the teacher model. Since Granite 3.3 2B doesn't support Kannada we translate the wikipedia documents to English, generate question-answer pairs in English and translated the generated question-answer pairs back to Kannada. We will use [IndicTrans v2 translation model](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface) for the same. 
 
 ## Table of Contents
 - [Overview](#overview)
-- [Generation Pipeline Overview](#reasoning-pipeline-overview)
-- [Notebook Structure](#notebook-structure)
-  - [Creating ICLs](#creating-icls)
+- [Generation Pipeline Overview](#generation-pipeline-overview)
+- [Running the Pipeline](#running-the-pipeline)
+  - [Prerequisites](#Prerequisites)
   - [Generating Data](#generating-data)
 
 ## Overview
@@ -20,58 +20,84 @@ The workflow includes:
 
 ```mermaid
 graph LR
-    A[Input Section] --> B[Scenario Generation]
-    B --> C[Response Generation]
-    C --> D[Scenario and Response Tranlation]
+    A[Input Wikipedia Passage] --> B[Kannada Passage Translation to English]
+    B --> C[Question Generation]
+    C --> D[Answer Generation]
+    D --> E[Question and Answer Translation to Kannada]
 ```
 
-### Scenario-Response Generation
+### Kannada Passage Translation to English
+We use IndicTrans v2, specifically `ai4bharat/indictrans2-indic-en-dist-200M` model to translate Kannada Wikipedia passages to English.
 
-* Our SDG pipeline leverages the generation capabilities of language models to generate a diverse set of scenrios and responses for the provided sections from Bharatiya Nyaya Sanhita.
-* Scenario represents real-life questions which a common person might ask a lawyer.
+### Question Generation
 
-### Scenario-Response Translation
+* Our SDG pipeline leverages the generation capabilities of language models to generate a diverse set of question and answers based on the translated passages.
 
-* Once we generate scenarios and responses, they are translated to Kannada using Facebook NLLB translation model.
+### Answer Generation
 
-## Notebook Structure
-The notebook is logically divided in below sections:
-### Creating ICLs
-- SDG works by creating a set Scenario-Response pairs from the source document.
-- To do this we first need to create an example document and a set of Scenario-Response pairs. The SDG will use these to generate more synthetic Scenario-Response pairs on top of all your document.
+* Once we generate questions, we leverages the generation capabilities of language models to generate answer to the question grounded on the document.
+
+### Question and Answer Translation to Kannada
+We use IndicTrans v2 `ai4bharat/indictrans2-en-indic-dist-200M` model to translate generated question-answer pairs back to Kannada.
+
+## Running the Pipeline
+To run the pipeline we need to install a set of packages.
+
+### Prerequisites
+Before running the pipeline, let us install the required packages.
+```bash
+pip install -r requirements.txt
+```
+
+We need to start two servers one for serving the LLM and the other for serving the translation system. To start the LLM endpoint, run the command in a different terminal
+```bash
+llm serve ibm-granite/granite-3.3-2b-instruct --port 8082 --max_model_len 2048
+```
+You can choose any LLM for serving.
+
+Before serving the translation model, please follow the instructions [here](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface) for installing the required packages. Once installed, run the following command in a new terminal
+```bash
+uvicorn indic_trans_server:app --reload
+```
 
 ### Generating Data
-- In next few sections you will:
-    - Learn how we added prompts for the teacher model
-    - Generated data
+Before running the SDG pipeline, we need to create dataset which contains the documents on which question-answer pairs needs to be generated. Run the following command for the same
+
+```bash
+python create_seed_data.py
+```
+
+Now, let us run the genration pipeline
+```bash
+python generate.py --ds_path sdg_demo_output/seed_data.jsonl --llm_endpoint  http://0.0.0.0:8082/v1 --translation_endpoint http://127.0.0.1:8000/v1 --save_path output/generated_datapoints.jsonl --flow flows/translate_flow_knowledge.yaml --checkpoint_dir output/checkpoint_dir/ 
+```
 
 ## How does the generated data look like?
 
 #### Input Raw Document
 ```text
-"Chapter_III
-
-Section_27
-
-not extend to (a) the intentional causing of death, or to the attempting to cause death; (b) the doing of anything which the person doing it knows to be likely to cause
+ಎಸ್.ನಿಜಲಿಂಗಪ್ಪ
+ಕರ್ನಾಟಕದ ಏಕೀಕರಣಕ್ಕೆ ಹೋರಾಡಿದ ರಾಜಕಾರಣಿಗಳಲ್ಲಿ ಪ್ರಮುಖರು
 ```
 
-
-### Generated data
-
-#### Generated Scenario-Response Pair
+#### Translated Document in English
 ```text
-Scenario: Suppose I urge my friend C to steal a car from a dealership, knowing full well it's illegal. Although I don't physically assist in the theft, C goes ahead and takes the vehicle. Can I face the same legal repercussions for abetting this crime under the Bharatiya Nyaya Sanhita?
-
-Response: In accordance with Chapter III, Section 27 of the Bharatiya Nyaya Sanhita, yes, you can be held equally liable as the perpetrator under such circumstances. This principle applies to situations where an individual intentionally abets a crime, including the act of theft in this case, even when they do not physically participate in the commission.
+S. Nijalingappa
+Prominent among the politicians who fought for the unification of Karnataka
 ```
 
-#### Translated Scenario-Response Pair
+#### Generated Question-Answer Pair
 ```text
-Scenario:
+Question: Who was a prominent politician known for fighting for the unification of Karnataka, as mentioned in the document?
 
-
-Response:
+Answer: S. Nijalingappa
 ```
 
+#### Translated Question-Answer Pair
+```text
+Question: 
+ಡಾಕ್ಯುಮೆಂಟ್ನಲ್ಲಿ ಉಲ್ಲೇಖಿಸಿರುವಂತೆ, ಕರ್ನಾಟಕದ ಏಕೀಕರಣಕ್ಕಾಗಿ ಹೋರಾಡಿದ ಪ್ರಸಿದ್ಧ ರಾಜಕಾರಣಿ ಯಾರು?
 
+Answer:
+ಎಸ್.ನಿಜಲಿಂಪ್ಪ
+```
