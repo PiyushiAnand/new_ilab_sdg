@@ -5,8 +5,8 @@ This notebook demonstrates how to use the `sdg` package to generate synthetic qu
 ## Table of Contents
 - [Overview](#overview)
 - [Generation Pipeline Overview](#generation-pipeline-overview)
-- [Notebook Structure](#notebook-structure)
-  - [Creating ICLs](#creating-icls)
+- [Running the Pipeline](#running-the-pipeline)
+  - [Prerequisites](#Prerequisites)
   - [Generating Data](#generating-data)
 
 ## Overview
@@ -39,6 +39,38 @@ We use IndicTrans v2, specifically `ai4bharat/indictrans2-indic-en-dist-200M` mo
 
 ### Question and Answer Translation to Kannada
 We use IndicTrans v2 `ai4bharat/indictrans2-en-indic-dist-200M` model to translate generated question-answer pairs back to Kannada.
+
+## Running the Pipeline
+To run the pipeline we need to install a set of packages.
+
+### Prerequisites
+Before running the pipeline, let us install the required packages.
+```bash
+pip install -r requirements.txt
+```
+
+We need to start two servers one for serving the LLM and the other for serving the translation system. To start the LLM endpoint, run the command in a different terminal
+```bash
+llm serve ibm-granite/granite-3.3-2b-instruct --port 8082 --max_model_len 2048
+```
+You can choose any LLM for serving.
+
+Before serving the translation model, please follow the instructions [here](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface) for installing the required packages. Once installed, run the following command in a new terminal
+```bash
+uvicorn indic_trans_server:app --reload
+```
+
+### Generating Data
+Before running the SDG pipeline, we need to create dataset which contains the documents on which question-answer pairs needs to be generated. Run the following command for the same
+
+```bash
+python create_seed_data.py
+```
+
+Now, let us run the genration pipeline
+```bash
+python generate.py --ds_path sdg_demo_output/seed_data.jsonl --llm_endpoint  http://0.0.0.0:8082/v1 --translation_endpoint http://127.0.0.1:8000/v1 --save_path output/generated_datapoints.jsonl --flow flows/translate_flow_knowledge.yaml --checkpoint_dir output/checkpoint_dir/ 
+```
 
 ## How does the generated data look like?
 
