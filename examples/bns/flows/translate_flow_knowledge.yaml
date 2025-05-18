@@ -1,7 +1,7 @@
 - block_type: LLMBlock
   block_config:
     block_name: scenario_generation
-    model_id: "ibm-granite/granite-3.3-8b-instruct"
+    model_id: "ibm-granite/granite-3.3-2b-instruct"
     config_path: configs/generate_scenario.yaml
     output_cols:
       - scenario
@@ -18,7 +18,7 @@
 - block_type: LLMBlock
   block_config:
     block_name: response_generation
-    model_id: "ibm-granite/granite-3.3-8b-instruct"
+    model_id: "ibm-granite/granite-3.3-2b-instruct"
     config_path: configs/generate_response.yaml
     output_cols:
       - response

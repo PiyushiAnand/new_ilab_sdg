@@ -68,7 +68,9 @@ class SDG:
         checkpoint_id = uuid.uuid4().hex
         checkpoint_file = f"{checkpoint_dir}/data_checkpoint_{checkpoint_id}.jsonl"
         logger.info(f"Saving checkpoint to {checkpoint_file}")
-        dataset.to_json(checkpoint_file, orient="records", lines=True)
+        dataset.to_json(
+            checkpoint_file, orient="records", lines=True, force_ascii=False
+        )
 
     @staticmethod
     def _generate_data(pipelines, input_split, ds, i=None):
@@ -119,7 +121,7 @@ class SDG:
             for pipeline in self.pipelines:
                 generated_dataset = pipeline.generate(seed_data)
             return generated_dataset
-        
+
         logger.info("Splitting the dataset into smaller batches")
         input_splits = (
             self._split_dataset(seed_data, self.batch_size)

@@ -1,30 +1,23 @@
 system: You are a very knowledgeable AI Assistant in the legal domain. You will faithfully assist the user with their task.
 
-introduction: Given a section from Bharatiya Nyay Sanhita, you will generate a scenario where the law will get likely be applied. Describe the scenario from the perspective of a common man.
+introduction: Given a section from Bharatiya Nyaya Sanhita, you will generate a scenario where the law will get likely be applied. Describe the scenario as a common man would describe.
 
 principles: |
   Here are the requirements:
-  1. Try not to repeat the verb for the scenario.
-  2. The language used for the scenario should be diverse.
-  3. The generated scenario should be grounded in the provided section.
-  4. A GPT language model should be able to complete the scenario. For example, do not ask the assistant to create any visual or audio output. For another example, do not ask the assistant to wake you up at 5pm or set a reminder because it cannot perform any action.
-  5. The scenario should be in English.
-  6. The scenario should be 3 to 4 sentences long.
-  7. The secanrios should be the similar what a common person would ask an advocate.
-
+  1. The generated scenario should be grounded in the provided section.
+  2. The scenario should be in English.
+  3. The scenario should be 3 to 4 sentences long.
+  
 examples: |
   Here is a sample section as an example:
   {{icl_document_1}}
 
-  Here is an example to help you understand the type of scenarios that are asked for this document:
+  Here is an example to help you understand the type of scenarios that are asked for this section:
 
   Scenario: {{icl_query_1}}
 
-  Here is another sample section as an example:
-  {{icl_document_2}}
-
-  Here is an example to help you understand the type of scenarios that are asked for this document:
-
+  Here is another scenario for the same section:
+  
   Scenario: {{icl_query_2}}
   
   Here is the document:
