@@ -61,18 +61,32 @@ print(f"Chunked data into {len(bns_documents_chunked)} chunks")
 doc_with_icl = []
 
 icl_context_1 = """
-CHAPTER IV: OF ABETMENT, CRIMINAL CONSPIRACY AND ATTEMPT
-Section 49: 
-Punishment of abetment if act abetted is committed in consequence and where no express provision is made for its punishment Whoever abets any offence shall, if the act abetted is committed in consequence of the abetment, and no express provision is made by this Sanhita for the punishment of such abetment, be punished with the punishment provided for the offence. Explanation: An act or offence is said to be committed in consequence of abetment, when it is committed in consequence of the instigation, or in pursuance of the conspiracy, or with the aid which constitutes the abetment. Illustrations. (a) A instigates B to give false evidence. B, in consequence of the instigation, commits that offence. A is guilty of abetting that offence, and is liable to the same punishment as B. (b) A and B conspire to poison Z. A, in pursuance of the conspiracy, procures the poison and delivers it to B in order that he may administer it to Z. B, in pursuance of the conspiracy, administers the poison to Z in As absence and thereby causes Zs death. Here B is guilty of murder. A is guilty of abetting that offence by conspiracy, and is liable to the punishment for murder.
+CHAPTER XVII: OF OFFENCES AGAINST PROPERTY
+
+Subchapter: Of criminal trespass
+
+Section 329: Criminal trespass and house-trespass
+(1) Whoever enters into or upon property in the possession of another with intent to commit an offence or to intimidate, insult or annoy any person in possession of such property or having lawfully entered into or upon such property, unlawfully remains there with intent thereby to intimidate, insult or annoy any such person or with intent to commit an offence is said to commit criminal trespass. (2) Whoever commits criminal trespass by entering into or remaining in any building, tent or vessel used as a human dwelling or any building used as a place for worship, or as a place for the custody of property, is said to commit house-trespass.
+Explanation: The introduction of any part of the criminal trespassers body is entering sufficient to constitute house-trespass. (3) Whoever commits criminal trespass shall be punished with imprisonment of either description for a term which may extend to three months, or with fine which may extend to five thousand rupees, or with both. (4) Whoever commits house-trespass shall be punished with imprisonment of either description for a term which may extend to one year, or with fine which may extend to five thousand rupees, or with both.
 """
 
-icl_scenario_1 = "If I encouraged someone to commit a crime and they actually went ahead and did it, but I wasn’t physically present at the scene, can I still be punished the same as the person who committed the crime under Indian law?"
+icl_scenario_1 = "I am living in a rented 1 BHK house in Bangalore for past two years. Everything was going smoothly. Last month the house owner asked me to vacate the house in a week. He has threatened me that if not then he will discontinue the water and electricity supply. I don't know what to do."
 
-icl_response_1 = "Based on Chapter Chapter IV and section 49 of Bharatiya Nyaya Sanhita, Yes, you can still be punished the same as the person who committed the crime."
+icl_response_1 = "According to Chapter XVII and section 329 of Bharatiya Nyaya Sanhita, illegally or forcefully removing a tenant from property they peacefully occupy constitutes criminal trespass."
 
-icl_scenario_2 = "If a senior executive's instructions or influence lead an employee to commit a wrongful act, could the executive be held criminally liable even if they weren’t directly involved in carrying it out?"
+icl_context_2 = """
+CHAPTER XIX: OF CRIMINAL INTIMIDATION, INSULT, ANNOYANCE, DEFAMATION, ETC.
 
-icl_response_2 = "Yes, under Chapter IV, Section 49 of the Bharatiya Nyaya Sanhita, if a senior executive instigates, conspires with, or provides aid that leads to the commission of an offence by an employee, they can be held criminally liable for abetment. This applies even if they were not directly involved in committing the act. If the offence was committed as a consequence of the abetment and there is no specific provision prescribing punishment for such abetment, the executive would be liable for the same punishment as the principal offender."
+Section 351: Criminal intimidation
+(1) Whoever threatens another by any means, with any injury to his person, reputation or property, or to the person or reputation of any one in whom that person is interested, with intent to cause alarm to that person, or to cause that person to do any act which he is not legally bound to do, or to omit to do any act which that person is legally entitled to do, as the means of avoiding the execution of such threat, commits criminal intimidation.
+Explanation: A threat to injure the reputation of any deceased person in whom the person threatened is interested, is within this section.
+Illustration.
+A, for the purpose of inducing B to resist from prosecuting a civil suit, threatens to burn Bs house. A is guilty of criminal intimidation. (2) Whoever commits the offence of criminal intimidation shall be punished with imprisonment of either description for a term which may extend to two years, or with fine, or with both. (3) Whoever commits the offence of criminal intimidation by threatening to cause death or grievous hurt, or to cause the destruction of any property by fire, or to cause an offence punishable with death or imprisonment for life, or with imprisonment for a term which may extend to seven years, or to impute unchastity to a woman, shall be punished with imprisonment of either description for a term which may extend to seven years, or with fine, or with both. (4) Whoever commits the offence of criminal intimidation by an anonymous communication, or having taken precaution to conceal the name or abode of the person from whom the threat comes, shall be punished with imprisonment of either description for a term which may extend to two years, in addition to the punishment provided for the offence under sub-section (1).
+"""
+
+icl_scenario_2 = "I am living in a rented 1 BHK house in Bangalore for past two years. Everything was going smoothly. Last month the house owner asked me to vacate the house in a week. He has threatened me that if not then he will discontinue the water and electricity supply. I don't know what to do."
+
+icl_response_2 = "Under Chapter XVII and section 329 of Bharatiya Nyaya Sanhita, property owners can be held liable for criminal trespass if they employ threats or coercive tactics, such as disconnecting essential utilities like water or electricity, to force out tenants in peaceful possession.RetryClaude can make mistakes. Please double-check responses."
 
 for each_document in bns_documents_chunked:
     icl_dict = {}

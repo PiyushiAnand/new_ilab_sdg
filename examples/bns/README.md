@@ -1,6 +1,6 @@
-# Synthetic Question-Answer Generation over Wikipedia Documents
+# Synthetic Query Generation over BNS Documents
 
-This notebook demonstrates how to use the `sdg` package to generate synthetic question-answer pairs using Kannada Wikipedia with Granite 3.3 2B as the teacher model. Since Granite 3.3 2B doesn't support Kannada we translate the wikipedia documents to English, generate question-answer pairs in English and translated the generated question-answer pairs back to Kannada. We will use [IndicTrans v2 translation model](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface) for the same. 
+This notebook demonstrates how to use the `sdg` package to generate synthetic queries using English BNS documents with Granite 3.3 2B as the teacher model. Since Granite 3.3 2B doesn't support Kannada we translate the generated queries from English to Kannada. We will use [IndicTrans v2 translation model](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface) for the same. 
 
 ## Table of Contents
 - [Overview](#overview)
@@ -20,25 +20,21 @@ The workflow includes:
 
 ```mermaid
 graph LR
-    A[Input Wikipedia Passage] --> B[Kannada Passage Translation to English]
-    B --> C[Question Generation]
-    C --> D[Answer Generation]
-    D --> E[Question and Answer Translation to Kannada]
+    A[Input BNS Section] --> B[Query Generation]
+    B --> C[Explanation Generation]
+    C --> D[Queries and Explanation Translation to Kannada]
 ```
 
-### Kannada Passage Translation to English
-We use IndicTrans v2, specifically `ai4bharat/indictrans2-indic-en-dist-200M` model to translate Kannada Wikipedia passages to English.
+### Query Generation
 
-### Question Generation
+* Our SDG pipeline leverages the generation capabilities of language models to generate a diverse set of queries for the given BNS section.
 
-* Our SDG pipeline leverages the generation capabilities of language models to generate a diverse set of question and answers based on the translated passages.
+### Explanation Generation
 
-### Answer Generation
+* Once we generate queries, we leverages the generation capabilities of language models to generate an explanation as to how the BNS section is applicable for the generated query.
 
-* Once we generate questions, we leverages the generation capabilities of language models to generate answer to the question grounded on the document.
-
-### Question and Answer Translation to Kannada
-We use IndicTrans v2 `ai4bharat/indictrans2-en-indic-dist-200M` model to translate generated question-answer pairs back to Kannada.
+### Queries and Explanation Translation to Kannada
+We use IndicTrans v2 `ai4bharat/indictrans2-en-indic-dist-200M` model to translate generated queries-explanation pairs back to Kannada.
 
 ## Running the Pipeline
 To run the pipeline we need to install a set of packages.
@@ -72,7 +68,7 @@ Now, let us run the genration pipeline
 python generate.py --ds_path sdg_demo_output/seed_data.jsonl --llm_endpoint  http://0.0.0.0:8082/v1 --translation_endpoint http://127.0.0.1:8000/v1 --save_path output/generated_datapoints.jsonl --flow flows/translate_flow_knowledge.yaml --checkpoint_dir output/checkpoint_dir/ 
 ```
 
-## How does the generated data look like?
+<!-- ## How does the generated data look like?
 
 #### Input Raw Document
 ```text
@@ -100,4 +96,4 @@ Question:
 
 Answer:
 ಎಸ್.ನಿಜಲಿಂಪ್ಪ
-```
+``` -->
