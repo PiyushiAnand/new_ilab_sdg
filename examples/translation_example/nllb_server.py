@@ -21,37 +21,50 @@ class CompletionRequest(BaseModel):
 
 @app.post("/v1/completions")
 async def translate(req: CompletionRequest):
-    # Set source and target language
-    tokenizer.src_lang = req.source_lang
+    try:
+        # Validate language codes
+        if (
+            req.source_lang not in tokenizer.lang_code_to_id
+            or req.target_lang not in tokenizer.lang_code_to_id
+        ):
+            return {
+                "error": f"Invalid language code. Available codes: {list(tokenizer.lang_code_to_id.keys())}"
+            }, 400
+        # Set source and target language
+        tokenizer.src_lang = req.source_lang
 
-    # Tokenize input
-    inputs = tokenizer(req.prompt, return_tensors="pt")
+        # Tokenize input
+        inputs = tokenizer(req.prompt, return_tensors="pt")
 
-    # Generate translation
-    with torch.no_grad():
-        output_tokens = model.generate(
-            **inputs,
-            forced_bos_token_id=tokenizer.convert_tokens_to_ids(req.target_lang),
-            max_length=req.max_length,
-        )
+        # Generate translation
+        with torch.no_grad():
+            output_tokens = model.generate(
+                **inputs,
+                forced_bos_token_id=tokenizer.convert_tokens_to_ids(req.target_lang),
+                max_length=req.max_length,
+            )
 
-    # Decode output
-    translated_text = tokenizer.batch_decode(output_tokens, skip_special_tokens=True)[0]
+        # Decode output
+        translated_text = tokenizer.batch_decode(
+            output_tokens, skip_special_tokens=True
+        )[0]
 
-    # Return response in OpenAI-style format
-    return {
-        "id": "nllb-translation",
-        "object": "text_completion",
-        "model": MODEL_NAME,
-        "choices": [
-            {
-                "text": translated_text,
-                "index": 0,
-                "logprobs": None,
-                "finish_reason": "stop",
-            }
-        ],
-    }
+        # Return response in OpenAI-style format
+        return {
+            "id": "nllb-translation",
+            "object": "text_completion",
+            "model": MODEL_NAME,
+            "choices": [
+                {
+                    "text": translated_text,
+                    "index": 0,
+                    "logprobs": None,
+                    "finish_reason": "stop",
+                }
+            ],
+        }
+    except Exception as e:
+        return {"error": f"Translation failed: {str(e)}"}, 500
 
 
 @app.get("/v1/completions")

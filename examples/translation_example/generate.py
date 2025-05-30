@@ -21,12 +21,6 @@ from tqdm import tqdm
 logger = setup_logger(__name__)
 
 
-### Granite 3.3 2B Chat Template
-@PromptRegistry.register("ibm-granite/granite-3.3-2b-instruct")
-def granite_3_3_2b_chat_template():
-    return """{# Alias tools -> available_tools #}\n{%- if tools and not available_tools -%}\n    {%- set available_tools = tools -%}\n{%- endif -%}\n{%- if messages[0]['role'] == 'system' %}\n     {%- set system_message = messages[0]['content'] %}\n     {%- set loop_messages = messages[1:] %}\n {%- else %}\n     {%- set system_message = \" Knowledge Cutoff Date: April 2024.\n. You are Granite, developed by IBM.\" %}\n     {%- if available_tools and documents %}\n         {%- set system_message = system_message + \" You are a helpful assistant with access to the following tools. When a tool is required to answer the user's query, respond only with <|tool_call|> followed by a JSON list of tools used. If a tool does not exist in the provided list of tools, notify the user that you do not have the ability to fulfill the request. \nWrite the response to the user's input by strictly aligning with the facts in the provided documents. If the information needed to answer the question is not available in the documents, inform the user that the question cannot be answered based on the available data.\" %}\n     {%- elif available_tools %}\n         {%- set system_message = system_message + \" You are a helpful assistant with access to the following tools. When a tool is required to answer the user's query, respond only with <|tool_call|> followed by a JSON list of tools used. If a tool does not exist in the provided list of tools, notify the user that you do not have the ability to fulfill the request.\" %}\n     {%- elif documents %}\n         {%- set system_message = system_message + \" Write the response to the user's input by strictly aligning with the facts in the provided documents. If the information needed to answer the question is not available in the documents, inform the user that the question cannot be answered based on the available data.\" %}\n    {%- elif thinking %}\n    {%- set system_message = system_message + \" You are a helpful AI assistant.\nRespond to every user query in a comprehensive and detailed way. You can write down your thoughts and reasoning process before responding. In the thought process, engage in a comprehensive cycle of analysis, summarization, exploration, reassessment, reflection, backtracing, and iteration to develop well-considered thinking process. In the response section, based on various attempts, explorations, and reflections from the thoughts section, systematically present the final solution that you deem correct. The response should summarize the thought process. Write your thoughts between <think></think> and write your response between <response></response> for each user query.\" %}\n     {%- else %}\n         {%- set system_message = system_message + \" You are a helpful AI assistant.\" %}\n     {%- endif %}\n     {%- if 'citations' in controls and documents %}\n         {%- set system_message = system_message + ' \nUse the symbols <|start_of_cite|> and <|end_of_cite|> to indicate when a fact comes from a document in the search result, e.g <|start_of_cite|> {document_id: 1}my fact <|end_of_cite|> for a fact from document 1. Afterwards, list all the citations with their corresponding documents in an ordered list.' %}\n     {%- endif %}\n     {%- if 'hallucinations' in controls and documents %}\n         {%- set system_message = system_message + ' \nFinally, after the response is written, include a numbered list of sentences from the response with a corresponding risk value that are hallucinated and not based in the documents.' %}\n     {%- endif %}\n     {%- set loop_messages = messages %}\n {%- endif %}\n {{- '<|start_of_role|>system<|end_of_role|>' + system_message + '<|end_of_text|>\n' }}\n {%- if available_tools %}\n     {{- '<|start_of_role|>available_tools<|end_of_role|>' }}\n     {{- available_tools | tojson(indent=4) }}\n     {{- '<|end_of_text|>\n' }}\n {%- endif %}\n {%- if documents %}\n     {%- for document in documents %}\n         {{- '<|start_of_role|>document {\"document_id\": \"' + document['doc_id'] | string + '\"}<|end_of_role|>\n' }}\n         {{- document['text'] }}\n         {{- '<|end_of_text|>\n' }}\n              {%- endfor %}\n {%- endif %}\n {%- for message in loop_messages %}\n     {{- '<|start_of_role|>' + message['role'] + '<|end_of_role|>' + message['content'] + '<|end_of_text|>\n' }}\n     {%- if loop.last and add_generation_prompt %}\n         {{- '<|start_of_role|>assistant' }}\n             {%- if controls %}\n                 {{- ' ' + controls | tojson()}}\n             {%- endif %}\n         {{- '<|end_of_role|>' }}\n     {%- endif %}\n {%- endfor %}"""
-
-
 @click.command()
 @click.option(
     "--ds_path",
@@ -116,7 +110,14 @@ def main(
 
     logger.warning(f"Dataset: {ds}")
 
-    openai_api_key = "EMPTY"
+    # Use environment variables or secure storage for API keys
+    import os
+
+    openai_api_key = os.environ.get("OPENAI_API_KEY", "EMPTY")
+    if openai_api_key == "EMPTY":
+        logger.warning(
+            "Using empty API key. Make sure your endpoints don't require authentication."
+        )
     llm_openai_api_base = llm_endpoint
 
     llm_client = OpenAI(
@@ -137,9 +138,20 @@ def main(
 
     flow_cfg = Flow(llm_client=llm_client).get_flow_from_file(flow)
 
+    # Track if we found any TranslationBlock instances
+    translation_blocks_found = False
+
     for index in range(len(flow_cfg)):
-        if issubclass(flow_cfg[index]["block_type"], TranslationBlock):
-            flow_cfg[index]["block_config"]["client"] = translation_client
+        try:
+            if issubclass(flow_cfg[index]["block_type"], TranslationBlock):
+                flow_cfg[index]["block_config"]["client"] = translation_client
+                translation_blocks_found = True
+        except (KeyError, TypeError) as e:
+            logger.error(f"Error processing flow config at index {index}: {e}")
+            raise ValueError(f"Invalid flow configuration at index {index}") from e
+
+    if not translation_blocks_found:
+        logger.warning("No TranslationBlock instances found in the flow configuration.")
 
     sdg = SDG(
         [Pipeline(flow_cfg)],

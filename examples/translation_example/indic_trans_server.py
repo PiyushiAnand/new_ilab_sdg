@@ -29,6 +29,32 @@ indic_en_model.eval()
 ip = IndicProcessor(inference=True)
 
 
+def translate_text(text_batch, model, tokenizer):
+    inputs = tokenizer(
+        text_batch,
+        truncation=True,
+        padding="longest",
+        return_tensors="pt",
+        return_attention_mask=True,
+    )
+
+    with torch.no_grad():
+        output = model.generate(
+            **inputs,
+            use_cache=True,
+            min_length=0,
+            max_length=256,
+            num_beams=5,
+            num_return_sequences=1,
+        )
+
+    return tokenizer.batch_decode(
+        output,
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=True,
+    )
+
+
 # Input format mimicking OpenAI completion endpoint
 class CompletionRequest(BaseModel):
     prompt: str
@@ -46,53 +72,9 @@ async def translate(req: CompletionRequest):
     )
 
     if req.source_lang == "eng_Latn":
-        inputs = en_indic_tokenizer(
-            batch,
-            truncation=True,
-            padding="longest",
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-
-        with torch.no_grad():
-            output = en_indic_model.generate(
-                **inputs,
-                use_cache=True,
-                min_length=0,
-                max_length=256,
-                num_beams=5,
-                num_return_sequences=1,
-            )
-        # Decode the generated tokens into text
-        generated_tokens = en_indic_tokenizer.batch_decode(
-            output,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=True,
-        )
+        generated_tokens = translate_text(batch, en_indic_model, en_indic_tokenizer)
     else:
-        inputs = indic_en_tokenizer(
-            batch,
-            truncation=True,
-            padding="longest",
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-
-        with torch.no_grad():
-            output = indic_en_model.generate(
-                **inputs,
-                use_cache=True,
-                min_length=0,
-                max_length=256,
-                num_beams=5,
-                num_return_sequences=1,
-            )
-        # Decode the generated tokens into text
-        generated_tokens = indic_en_tokenizer.batch_decode(
-            output,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=True,
-        )
+        generated_tokens = translate_text(batch, indic_en_model, indic_en_tokenizer)
 
     translations = ip.postprocess_batch(generated_tokens, lang=req.target_lang)
 
@@ -118,76 +100,8 @@ async def translate(req: CompletionRequest):
 
 @app.get("/v1/completions")
 async def translate(source_lang: str, target_lang: str, prompt: str):
-    batch = ip.preprocess_batch(
-        [prompt],
-        src_lang=source_lang,
-        tgt_lang=target_lang,
+    # Create a request object and reuse the POST endpoint logic
+    req = CompletionRequest(
+        prompt=prompt, source_lang=source_lang, target_lang=target_lang
     )
-
-    if source_lang == "eng_Latn":
-        inputs = en_indic_tokenizer(
-            batch,
-            truncation=True,
-            padding="longest",
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-
-        with torch.no_grad():
-            output = en_indic_model.generate(
-                **inputs,
-                use_cache=True,
-                min_length=0,
-                max_length=256,
-                num_beams=5,
-                num_return_sequences=1,
-            )
-        # Decode the generated tokens into text
-        generated_tokens = en_indic_tokenizer.batch_decode(
-            output,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=True,
-        )
-    else:
-        inputs = indic_en_tokenizer(
-            batch,
-            truncation=True,
-            padding="longest",
-            return_tensors="pt",
-            return_attention_mask=True,
-        )
-
-        with torch.no_grad():
-            output = indic_en_indic_model.generate(
-                **inputs,
-                use_cache=True,
-                min_length=0,
-                max_length=256,
-                num_beams=5,
-                num_return_sequences=1,
-            )
-        # Decode the generated tokens into text
-        generated_tokens = indic_en_tokenizer.batch_decode(
-            output,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=True,
-        )
-
-    translations = ip.postprocess_batch(generated_tokens, lang=target_lang)
-
-    # Return response in OpenAI-style format
-    return {
-        "id": "indictrans-translation",
-        "object": "text_completion",
-        "model": (
-            INDIC_EN_MODEL_NAME if target_lang == "eng_Latn" else EN_INDIC_MODEL_NAME
-        ),
-        "choices": [
-            {
-                "text": translations[0],
-                "index": 0,
-                "logprobs": None,
-                "finish_reason": "stop",
-            }
-        ],
-    }
+    return await translate(req)

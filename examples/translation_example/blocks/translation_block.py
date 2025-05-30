@@ -45,17 +45,21 @@ class TranslationBlock(Block):
         """Translates a single string and returns the translated text."""
         logging.debug(f"Translating text using model {self.trans_model_id}")
 
-        response = self.client.completions.create(
-            model=self.trans_model_id,
-            prompt=text,
-            extra_body={
-                "source_lang": self.source_lang,
-                "target_lang": self.target_lang,
-                "max_length": 512,
-            },
-        )
+        try:
+            response = self.client.completions.create(
+                model=self.trans_model_id,
+                prompt=text,
+                extra_body={
+                    "source_lang": self.source_lang,
+                    "target_lang": self.target_lang,
+                    "max_length": 512,
+                },
+            )
 
-        return response.choices[0].text
+            return response.choices[0].text
+        except Exception as e:
+            logger.error(f"Translation failed with error: {str(e)}")
+            return None  # Return original text as fallback
 
     def _translate_samples(self, samples) -> list:
         logger.debug(f"Starting translation...:")
@@ -68,7 +72,11 @@ class TranslationBlock(Block):
             translated_texts = []
 
             for text in columns_to_translate:
-                translated_texts.append(self._translate(text))
+                translated_text = self._translate(text)
+                if translated_text is None:
+                    logger.warning(f"Translation failed for text: {text[:50]}...")
+                    translated_text = text  # Use original text as fallback
+                translated_texts.append(translated_text)
 
             results.append(translated_texts)
             progress_bar.update(1)
