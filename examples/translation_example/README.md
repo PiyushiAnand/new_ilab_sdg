@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 We need to start two servers one for serving the LLM and the other for serving the translation system. To start the LLM endpoint, run the command in a different terminal
 ```bash
-llm serve ibm-granite/granite-3.3-2b-instruct --port 8082 --max_model_len 2048
+vllm serve ibm-granite/granite-3.3-2b-instruct --port 8082 --max_model_len 2048
 ```
 You can choose any LLM for serving.
 

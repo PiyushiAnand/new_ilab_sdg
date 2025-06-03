@@ -44,9 +44,8 @@ def nemotron_chat_template():
 {%- endif %}"""
 
 
-### Granite 3.3 2B Chat Template
-@PromptRegistry.register("ibm-granite/granite-3.3-2b-instruct")
-def granite_3_3_2b_chat_template():
+### Granite 3.3 2B and 8B Chat Template
+def granite_3_3_chat_template():
     return """
 {# Alias tools -> available_tools #}
 {%- if tools and not available_tools -%}
@@ -101,3 +100,11 @@ def granite_3_3_2b_chat_template():
      {%- endif %}
  {%- endfor %}
 """
+
+
+PromptRegistry.register("ibm-granite/granite-3.3-2b-instruct")(
+    granite_3_3_chat_template
+)
+PromptRegistry.register("ibm-granite/granite-3.3-8b-instruct")(
+    granite_3_3_chat_template
+)
